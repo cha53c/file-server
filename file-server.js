@@ -80,7 +80,7 @@ methods.DELETE = function (path, respond) {
 
 
 methods.PUT = function (path, respond, request) {
-    var outStream = fs.createWriteStream(path);
+    let outStream = fs.createWriteStream(path);
     outStream.on("error", function (error) {
         console.log("500 error: " + error.toString());
         respond(500, error.toString());
@@ -93,13 +93,17 @@ methods.PUT = function (path, respond, request) {
     console.log("writing file...");
 };
 
+methods.MKCOL = function (path, respond){
+    fs.mkdir(path, respondErrorOrNothing(respond));
+};
+
 function respondErrorOrNothing(respond) {
     return function (error) {
         if (error) {
             console.log("500 error: " + error.toString());
             respond(500, error.toString());
         } else {
-            console.log("204: file deleted");
+            console.log("204: operation successful");
             respond(204);
         }
     };
