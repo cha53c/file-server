@@ -19,6 +19,7 @@ http.createServer(function (request, response) {
     if (request.method in methods) {
         methods[request.method](urlToPath(request.url), respond, request);
     } else {
+        console.log("Method not allowed");
         respond(405, "Method " + request.method + " not allowed");
     }
 }).listen(8000);
@@ -36,12 +37,18 @@ methods.GET = function (path, respond) {
             respond(500, error.toString());
         } else if (stats.isDirectory()) {
             fs.readdir(path, function (error, files) {
-                if (error)
+                if (error) {
+                    console.log("500 error: " + error.toString());
                     respond(500, error.toString());
-                else
+                }
+                else {
+                    console.log("200: dir list successful")
                     respond(200, file.join("\n"));
+                }
+
             });
         } else {
+            console.log("200: returned file");
             respond(200, fs.createReadStream(path), mime.getType(path));
         }
     });
@@ -50,6 +57,7 @@ methods.GET = function (path, respond) {
 methods.DELETE = function (path, respond) {
     fs.stat(path, function (error, stats) {
         if (error && error.code == 'ENOENT') {
+            console.log("500 error: " + error.toString());
             respond(500, error.toString());
         } else if (stats.isDirectory()) {
             fs.rmdir(path, respondErrorOrNothing(respond));
@@ -63,19 +71,24 @@ methods.DELETE = function (path, respond) {
 methods.PUT = function (path, respond, request) {
     var outStream = fs.createWriteStream(path);
     outStream.on("error", function (error) {
+        console.log("500 error: " + error.toString());
         respond(500, error.toString());
     });
     outStream.on("finish", function () {
+        console.log("204: file written");
         respond(204);
     });
     request.pipe(outStream);
+    console.log("writing file...");
 };
 
 function respondErrorOrNothing(respond) {
     return function (error) {
         if (error) {
+            console.log("500 error: " + error.toString());
             respond(500, error.toString());
         } else {
+            console.log("204: file deleted");
             respond(204);
         }
     };
