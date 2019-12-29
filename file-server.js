@@ -1,11 +1,14 @@
 const http = require("http"), fs = require("fs"), mime = require("mime");
 const methods = Object.create(null);
-const FILE_HOME = "./uploaded_files"
+const FILE_HOME = "./uploaded_files";
+const PORT = 8000;
 
-http.createServer(function (request, response) {
-    if(!fs.existsSync(FILE_HOME)){
+const server = http.createServer(function (request, response) {
+    if(fs.existsSync(FILE_HOME)) {
+        console.log("file home: " + FILE_HOME);
+    } else {
         fs.mkdirSync(FILE_HOME);
-        console.log("created dir: " + FILE_HOME);
+        console.log("created file home dir: " + FILE_HOME);
     }
     function respond(code, body, type) {
         if (!type) type = "text/plain";
@@ -22,7 +25,15 @@ http.createServer(function (request, response) {
         console.log("Method not allowed");
         respond(405, "Method " + request.method + " not allowed");
     }
-}).listen(8000);
+});
+
+start();
+
+function start(){
+    server.listen(PORT);
+    console.log("Started server on port: " + PORT);
+};
+
 
 function urlToPath(url) {
     let path = require("url").parse(url).pathname;
