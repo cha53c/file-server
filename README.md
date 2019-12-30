@@ -6,7 +6,7 @@ retrieve file
 
 `curl -X http://localhost:8000/file.txt`
 
-delete file
+delete file/dir
 
 `curl -X DELETE http://localhost:8000/file.txt`
 
